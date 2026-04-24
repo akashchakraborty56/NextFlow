@@ -1,0 +1,72 @@
+import type { NodeRegistryEntry, NodeType } from '@/types/nodes';
+
+export const NODE_REGISTRY: Record<NodeType, NodeRegistryEntry> = {
+  'text': {
+    type: 'text',
+    label: 'Text',
+    description: 'Static text input',
+    icon: 'Type',
+    color: 'amber',
+    inputs: [],
+    outputs: [{ key: 'text', label: 'Text', type: 'text', handleId: 'text-out' }],
+    defaultConfig: { text: '' },
+  },
+  'upload-image': {
+    type: 'upload-image',
+    label: 'Upload Image',
+    description: 'Upload an image file',
+    icon: 'ImagePlus',
+    color: 'blue',
+    inputs: [],
+    outputs: [{ key: 'imageUrl', label: 'Image URL', type: 'image', handleId: 'image-out' }],
+    defaultConfig: {},
+  },
+  'upload-video': {
+    type: 'upload-video',
+    label: 'Upload Video',
+    description: 'Upload a video file',
+    icon: 'VideoIcon',
+    color: 'purple',
+    inputs: [],
+    outputs: [{ key: 'videoUrl', label: 'Video URL', type: 'video', handleId: 'video-out' }],
+    defaultConfig: {},
+  },
+  'llm': {
+    type: 'llm',
+    label: 'LLM',
+    description: 'AI text generation (Gemini)',
+    icon: 'Brain',
+    color: 'red',
+    inputs: [
+      { key: 'system_prompt', label: 'System Prompt', type: 'textarea', required: false, handleId: 'system-prompt-in' },
+      { key: 'user_message', label: 'User Message', type: 'textarea', required: true, handleId: 'user-message-in' },
+      { key: 'images', label: 'Images', type: 'file-image', required: false, handleId: 'image-in' },
+    ],
+    outputs: [{ key: 'generatedText', label: 'Generated Text', type: 'text', handleId: 'text-out' }],
+    defaultConfig: { model: 'gemini-2.0-flash', temperature: 0.7 },
+  },
+  'crop-image': {
+    type: 'crop-image',
+    label: 'Crop Image',
+    description: 'Crop an image region (%)',
+    icon: 'Crop',
+    color: 'emerald',
+    inputs: [
+      { key: 'imageUrl', label: 'Image', type: 'file-image', required: true, handleId: 'image-in' },
+    ],
+    outputs: [{ key: 'croppedImageUrl', label: 'Cropped Image', type: 'image', handleId: 'image-out' }],
+    defaultConfig: { xPercent: 0, yPercent: 0, widthPercent: 100, heightPercent: 100 },
+  },
+  'extract-frame': {
+    type: 'extract-frame',
+    label: 'Extract Frame',
+    description: 'Extract a frame from video',
+    icon: 'Film',
+    color: 'emerald',
+    inputs: [
+      { key: 'videoUrl', label: 'Video', type: 'file-video', required: true, handleId: 'video-in' },
+    ],
+    outputs: [{ key: 'frameImageUrl', label: 'Frame Image', type: 'image', handleId: 'image-out' }],
+    defaultConfig: { timestamp: 0, timestampMode: 'seconds' },
+  },
+};
