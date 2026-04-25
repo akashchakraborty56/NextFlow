@@ -19,7 +19,7 @@ export default defineConfig({
   build: {
     extensions: [
       aptGet({ packages: ["ffmpeg"] }),
-      prismaExtension({ schema: "prisma/schema.prisma" }),
+      prismaExtension({ mode: "legacy", schema: "prisma/schema.prisma" }),
     ],
   },
   dirs: ["./src/trigger"],
