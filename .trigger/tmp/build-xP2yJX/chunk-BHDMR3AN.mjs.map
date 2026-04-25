@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": ["../../../src/trigger/text-task.ts"],
+  "mappings": ";;;;;;;;;;AAAA;AAMO,IAAM,WAAW,KAAK;AAAA,EAC3B,IAAI;AAAA,EACJ,aAAa;AAAA,EACb,OAAO,EAAE,aAAa,EAAE;AAAA,EACxB,KAAK,8BAAO,YAAyB;AACnC,WAAO,KAAK,qBAAqB,EAAE,YAAY,QAAQ,KAAK,OAAO,CAAC;AACpE,WAAO,EAAE,MAAM,QAAQ,QAAQ,GAAG;AAAA,EACpC,GAHK;AAIP,CAAC;",
+  "names": []
+}
