@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../src/trigger/text-task.ts"],
+  "sourcesContent": ["import { task, logger } from \"@trigger.dev/sdk/v3\";\r\n\r\ninterface TextPayload {\r\n  text: string;\r\n}\r\n\r\nexport const textTask = task({\r\n  id: \"text-process\",\r\n  maxDuration: 30,\r\n  retry: { maxAttempts: 1 },\r\n  run: async (payload: TextPayload) => {\r\n    logger.info(\"Text task started\", { textLength: payload.text.length });\r\n    return { text: payload.text ?? \"\" };\r\n  },\r\n});\r\n"],
+  "mappings": ";;;;;;;;;;AAAA;AAMO,IAAM,WAAW,KAAK;AAAA,EAC3B,IAAI;AAAA,EACJ,aAAa;AAAA,EACb,OAAO,EAAE,aAAa,EAAE;AAAA,EACxB,KAAK,8BAAO,YAAyB;AACnC,WAAO,KAAK,qBAAqB,EAAE,YAAY,QAAQ,KAAK,OAAO,CAAC;AACpE,WAAO,EAAE,MAAM,QAAQ,QAAQ,GAAG;AAAA,EACpC,GAHK;AAIP,CAAC;",
+  "names": []
+}

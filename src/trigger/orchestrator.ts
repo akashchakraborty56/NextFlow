@@ -274,8 +274,9 @@ export const orchestratorTask = task({
               }
 
               case "CROP_IMAGE": {
+                const imageUrl = resolvedInputs.imageUrl ?? resolvedInputs.image ?? (Array.isArray(resolvedInputs.images) ? resolvedInputs.images[0] : '');
                 const result = await cropImageTask.triggerAndWait({
-                  imageUrl: resolvedInputs.imageUrl ?? resolvedInputs.image ?? '',
+                  imageUrl: imageUrl ?? '',
                   xPercent: config.xPercent ?? 0,
                   yPercent: config.yPercent ?? 0,
                   widthPercent: config.widthPercent ?? 100,
@@ -290,8 +291,9 @@ export const orchestratorTask = task({
               }
 
               case "EXTRACT_FRAME": {
+                const videoUrl = resolvedInputs.videoUrl ?? resolvedInputs.video ?? (Array.isArray(resolvedInputs.videos) ? resolvedInputs.videos[0] : '');
                 const result = await extractFrameTask.triggerAndWait({
-                  videoUrl: resolvedInputs.videoUrl ?? resolvedInputs.video ?? '',
+                  videoUrl: videoUrl ?? '',
                   timestamp: config.timestamp ?? 0,
                   timestampMode: config.timestampMode ?? 'seconds',
                 });
