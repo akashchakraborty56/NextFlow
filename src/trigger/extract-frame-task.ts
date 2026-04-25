@@ -1,11 +1,9 @@
 import { task, logger } from "@trigger.dev/sdk/v3";
 import ffmpeg from 'fluent-ffmpeg';
-import installer from '@ffmpeg-installer/ffmpeg';
 import { promises as fs } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-ffmpeg.setFfmpegPath(installer.path);
 
 interface ExtractFramePayload {
   videoUrl: string;
