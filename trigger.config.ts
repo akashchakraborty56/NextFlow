@@ -1,5 +1,6 @@
 import { defineConfig } from "@trigger.dev/sdk/v3";
 import { aptGet } from "@trigger.dev/build/extensions/core";
+import { prismaExtension } from "@trigger.dev/build/extensions/prisma";
 
 export default defineConfig({
   project: process.env.TRIGGER_PROJECT_REF!,
@@ -16,8 +17,10 @@ export default defineConfig({
     },
   },
   build: {
-    external: ["@prisma/client", ".prisma/client"],
-    extensions: [aptGet({ packages: ["ffmpeg"] })],
+    extensions: [
+      aptGet({ packages: ["ffmpeg"] }),
+      prismaExtension({ schema: "prisma/schema.prisma" }),
+    ],
   },
   dirs: ["./src/trigger"],
 });
