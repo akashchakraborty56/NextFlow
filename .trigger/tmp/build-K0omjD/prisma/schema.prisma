@@ -1,0 +1,197 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum NodeType {
+  TEXT
+  UPLOAD_IMAGE
+  UPLOAD_VIDEO
+  LLM
+  CROP_IMAGE
+  EXTRACT_FRAME
+}
+
+enum ExecutionStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  FAILED
+  CANCELLED
+}
+
+enum NodeExecutionStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  FAILED
+  SKIPPED
+}
+
+enum ExecutionMode {
+  FULL
+  PARTIAL
+  SINGLE_NODE
+}
+
+// ─────────────────────────────────────────────
+// MODELS
+// ─────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique @map("clerk_id")
+  email     String   @unique
+  name      String?
+  avatarUrl String?  @map("avatar_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  workflows     Workflow[]
+  executionRuns ExecutionRun[]
+
+  @@map("users")
+}
+
+model Workflow {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  name        String   @default("Untitled Workflow")
+  description String?
+  isTemplate  Boolean  @default(false) @map("is_template")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  /// [CanvasState]
+  canvasState Json? @map("canvas_state")
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nodes         WorkflowNode[]
+  edges         WorkflowEdge[]
+  executionRuns ExecutionRun[]
+
+  @@index([userId])
+  @@index([isTemplate])
+  @@map("workflows")
+}
+
+model WorkflowNode {
+  id         String   @id @default(cuid())
+  workflowId String   @map("workflow_id")
+  nodeType   NodeType @map("node_type")
+  label      String
+
+  positionX Float @map("position_x")
+  positionY Float @map("position_y")
+
+  /// [NodeInputData[]]
+  inputs Json @default("[]")
+
+  /// [NodeOutputData[]]
+  outputs Json @default("[]")
+
+  /// [NodeConfig]
+  config Json @default("{}")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  workflow       Workflow        @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  sourceEdges    WorkflowEdge[]  @relation("SourceNode")
+  targetEdges    WorkflowEdge[]  @relation("TargetNode")
+  nodeExecutions NodeExecution[]
+
+  @@index([workflowId])
+  @@index([nodeType])
+  @@map("workflow_nodes")
+}
+
+model WorkflowEdge {
+  id           String @id @default(cuid())
+  workflowId   String @map("workflow_id")
+  sourceNodeId String @map("source_node_id")
+  targetNodeId String @map("target_node_id")
+  sourceHandle String @map("source_handle")
+  targetHandle String @map("target_handle")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  workflow   Workflow     @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  sourceNode WorkflowNode @relation("SourceNode", fields: [sourceNodeId], references: [id], onDelete: Cascade)
+  targetNode WorkflowNode @relation("TargetNode", fields: [targetNodeId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceNodeId, sourceHandle, targetNodeId, targetHandle])
+  @@index([workflowId])
+  @@index([sourceNodeId])
+  @@index([targetNodeId])
+  @@map("workflow_edges")
+}
+
+model ExecutionRun {
+  id         String          @id @default(cuid())
+  workflowId String          @map("workflow_id")
+  userId     String          @map("user_id")
+  status     ExecutionStatus @default(PENDING)
+  mode       ExecutionMode   @default(FULL)
+
+  triggerRunId String? @map("trigger_run_id")
+
+  /// [ExecutionPlan]
+  executionPlan Json? @map("execution_plan")
+
+  startFromNodeId String? @map("start_from_node_id")
+
+  startedAt   DateTime  @default(now()) @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  durationMs  Int?      @map("duration_ms")
+  error       String?
+
+  workflow       Workflow        @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nodeExecutions NodeExecution[]
+
+  @@index([workflowId])
+  @@index([userId])
+  @@index([status])
+  @@index([startedAt(sort: Desc)])
+  @@map("execution_runs")
+}
+
+model NodeExecution {
+  id             String              @id @default(cuid())
+  executionRunId String              @map("execution_run_id")
+  workflowNodeId String              @map("workflow_node_id")
+  nodeType       NodeType            @map("node_type")
+  status         NodeExecutionStatus @default(PENDING)
+
+  /// [Record<string, any>]
+  resolvedInputs Json? @map("resolved_inputs")
+
+  /// [Record<string, any>]
+  outputs Json?
+
+  error       String?
+  startedAt   DateTime? @map("started_at")
+  completedAt DateTime? @map("completed_at")
+  durationMs  Int?      @map("duration_ms")
+
+  triggerRunId String? @map("trigger_run_id")
+
+  executionRun ExecutionRun @relation(fields: [executionRunId], references: [id], onDelete: Cascade)
+  workflowNode WorkflowNode @relation(fields: [workflowNodeId], references: [id], onDelete: Cascade)
+
+  @@index([executionRunId])
+  @@index([workflowNodeId])
+  @@index([status])
+  @@map("node_executions")
+}

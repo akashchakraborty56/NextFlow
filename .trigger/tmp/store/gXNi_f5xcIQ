@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../../src/trigger/upload-image-task.ts"],
-  "sourcesContent": ["import { task, logger } from \"@trigger.dev/sdk/v3\";\r\n\r\ninterface UploadImagePayload {\r\n  imageUrl: string;\r\n}\r\n\r\nexport const uploadImageTask = task({\r\n  id: \"upload-image-process\",\r\n  maxDuration: 30,\r\n  retry: { maxAttempts: 1 },\r\n  run: async (payload: UploadImagePayload) => {\r\n    logger.info(\"Upload image task started\", { imageUrl: payload.imageUrl });\r\n    return { imageUrl: payload.imageUrl ?? \"\" };\r\n  },\r\n});\r\n"],
-  "mappings": ";;;;;;;;;;AAAA;AAMO,IAAM,kBAAkB,KAAK;AAAA,EAClC,IAAI;AAAA,EACJ,aAAa;AAAA,EACb,OAAO,EAAE,aAAa,EAAE;AAAA,EACxB,KAAK,8BAAO,YAAgC;AAC1C,WAAO,KAAK,6BAA6B,EAAE,UAAU,QAAQ,SAAS,CAAC;AACvE,WAAO,EAAE,UAAU,QAAQ,YAAY,GAAG;AAAA,EAC5C,GAHK;AAIP,CAAC;",
-  "names": []
-}

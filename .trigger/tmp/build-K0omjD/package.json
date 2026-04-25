@@ -1,0 +1,21 @@
+{
+  "dependencies": {
+    "@prisma/client": "5.22.0",
+    "import-in-the-middle": "1.11.0",
+    "prisma": "5.22.0"
+  },
+  "devDependencies": {
+  },
+  "name": "nextflow",
+  "peerDependencies": {
+  },
+  "private": true,
+  "scripts": {
+  },
+  "trustedDependencies": [
+    "@prisma/client",
+    "import-in-the-middle",
+    "prisma"
+  ],
+  "version": "0.1.0"
+}
