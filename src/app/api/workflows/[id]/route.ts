@@ -5,12 +5,16 @@ import { z } from 'zod';
 
 type Params = { params: Promise<{ id: string }> };
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest, { params }: Params) {
   const user = await getAuthUser();
   const { id } = await params;
+  
+  console.log(`[API] GET /api/workflows/${id} - User: ${user.id}`);
 
   const workflow = await prisma.workflow.findUnique({
-    where: { id, userId: user.id },
+    where: { id },
     include: {
       nodes: { orderBy: { createdAt: 'asc' } },
       edges: true,
@@ -18,7 +22,13 @@ export async function GET(req: NextRequest, { params }: Params) {
   });
 
   if (!workflow) {
-    return NextResponse.json({ error: 'Workflow not found' }, { status: 404 });
+    console.log(`[API] Workflow ${id} not found in database!`);
+    return NextResponse.json({ error: 'Workflow not found', debug: { id, userId: user.id } }, { status: 404 });
+  }
+
+  if (workflow.userId !== user.id) {
+    console.log(`[API] Workflow ${id} belongs to ${workflow.userId}, not ${user.id}`);
+    return NextResponse.json({ error: 'Workflow not found or access denied' }, { status: 404 });
   }
 
   return NextResponse.json(workflow);
@@ -46,7 +56,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
 
   await prisma.$transaction(async (tx) => {
     await tx.workflow.update({
-      where: { id, userId: user.id },
+      where: { id },
       data: { name, description, canvasState },
     });
 
@@ -90,7 +100,7 @@ export async function DELETE(req: NextRequest, { params }: Params) {
   const user = await getAuthUser();
   const { id } = await params;
 
-  await prisma.workflow.delete({ where: { id, userId: user.id } });
+  await prisma.workflow.deleteMany({ where: { id, userId: user.id } });
 
   return NextResponse.json({ success: true });
 }

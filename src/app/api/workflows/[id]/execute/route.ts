@@ -31,11 +31,12 @@ export async function POST(req: NextRequest, { params }: Params) {
 
   // Verify workflow ownership
   const workflow = await prisma.workflow.findUnique({
-    where: { id: workflowId, userId: user.id },
+    where: { id: workflowId },
+    select: { id: true, userId: true },
   });
 
-  if (!workflow) {
-    return NextResponse.json({ error: 'Workflow not found' }, { status: 404 });
+  if (!workflow || workflow.userId !== user.id) {
+    return NextResponse.json({ error: 'Workflow not found or access denied' }, { status: 404 });
   }
 
   // Create execution run
